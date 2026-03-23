@@ -82,6 +82,7 @@ In Claude Code, you can use the `/job-search` or `/role-prep` commands or simply
 | references/profile.md | 1,576 |
 | **Total** | **5,513** |
 
+*Note: your default-search-config.md and profile.md shall generate different results*
 ### Content Analysis
 
 | Metric | Value |
@@ -126,6 +127,8 @@ In Claude Code, you can use the `/job-search` or `/role-prep` commands or simply
 | Contamination score | 0.30 |
 | Scope breadth | 1 |
 - **Multi-interface tool detected:** aws, graphql, grpc, kafka
+
+*Note: the "Multi-iterface tool detections are not correct. The terms appear in my profile as technology keywords for searching and gap analysis*
 
 **Result: passed**
 
