@@ -1,0 +1,253 @@
+---
+name: job-search
+description: >
+  Run a daily job search for Product Manager roles, with configurable search criteria, deduplication
+  against previously seen listings, detailed match/gap analysis against a candidate profile, and
+  keyword mapping per role. Trigger this skill whenever the user asks to find jobs, run a job search,
+  check for new PM roles, look for work, show or edit their search criteria, or do anything related
+  to their job hunt.
+---
+
+# Job Search Skill
+
+Finds new job postings that haven't appeared in a previous search, analyses each against the
+candidate's profile, and surfaces keywords worth using. All search criteria are configurable
+by the user and persist between sessions.
+
+---
+
+## User Commands
+
+The skill responds to three types of request. Detect intent from the user's message:
+
+### "Run a search" / "Find me jobs" / "Check for new roles"
+→ Execute the full search pipeline: Steps 1–9 below. Results are presented in chat
+  **and** saved as a dated markdown report to `~/job-search/reports/`.
+
+### "Show me my search criteria" / "What are my current search settings?"
+→ Load `~/job-search/search-config.md` if it exists, otherwise load
+  `references/default-search-config.md` from this skill. Display the full contents clearly to
+  the user, labelled with its source:
+  - If from user's file: _"Here are your current search criteria (from `~/job-search/search-config.md`):"_
+  - If from defaults: _"You don't have a custom config yet. Here are the built-in defaults:"_
+
+  After displaying, ask: _"Would you like to change anything?"_
+
+### "Update my search criteria" / "Change the search settings" / "Edit [specific thing]"
+→ If the user specifies what to change, make the edit. If they don't, show the current
+  criteria first (as above) and ask what they'd like to modify.
+
+  Changes are always saved back to `~/job-search/search-config.md`. If that file doesn't
+  exist yet, create it by copying `references/default-search-config.md` and applying the
+  changes. Confirm what was saved: _"Updated. Your new search criteria have been saved to
+  `~/job-search/search-config.md`."_
+
+---
+
+## Step 1 — Load search config
+
+Read `~/job-search/search-config.md`.
+
+- **File exists** → use it as the active config for this session.
+- **File missing** → read `references/default-search-config.md` from this skill folder and
+  use it as the active config. Do not mention the fallback to the user during a search run —
+  just use it silently.
+
+The config defines: target titles, location, freshness window, strong signals, weak signals,
+and search query templates. All subsequent steps use the active config, not hardcoded values.
+
+---
+
+## Step 2 — Load seen jobs
+
+Read `~/job-search/seen_jobs.json`. If it doesn't exist, create it as `[]`.
+
+URLs already in this file must be **silently skipped** — don't mention them, don't count them.
+
+---
+
+## Step 3 — Load candidate profile
+
+Read `~/job-search/references/profile.md`.
+
+- **File exists** → load fully into context for Steps 6 and 7.
+- **File missing** → warn the user once at the top of your response:
+  > ⚠️ No profile found at `~/job-search/profile.md`. Match/gap analysis and keyword mapping
+  > will be skipped. See `references/profile-template.md` in this skill to get started.
+
+  Then continue without analysis sections.
+
+The profile must contain three sections: **Work History**, **Key Skills & Technologies**
+(split into Strong / Familiar), and **What I'm Looking For**. See `references/profile-template.md`
+for the expected structure.
+
+---
+
+## Step 4 — Search for jobs
+
+Run 8–12 web searches using the query templates from the active config. Vary the angle each
+time — different queries should surface different companies and sources. Always include temporal
+language ("last week", "past 6 days", "this week", current year) to bias toward fresh results.
+
+Prioritise variety over repetition.
+
+---
+
+## Step 5 — Fetch and validate each result
+
+For each promising URL:
+
+1. **Fetch the page** — confirm it's a real listing, not a category page, 404, or aggregator
+2. **Check the posting date** — skip anything older than the freshness window in the config
+3. **Check the URL** against `seen_jobs.json` — skip if already present
+4. **Score the fit** against the strong/weak signals in the config
+
+Hold in memory for each passing role:
+- Title, company, location, posting date
+- **Full job description text** — required for Steps 6 and 7
+- Fit signals spotted
+- Direct application URL
+
+---
+
+## Step 6 — Match/gap analysis
+
+_(Skip this step if `profile.md` was not found in Step 3.)_
+
+Compare the full JD against `profile.md`. Be specific and honest — a useful gap analysis is
+more valuable than a flattering one.
+
+### ✅ Matches
+Name the JD requirement, then explain what in the profile satisfies it. Reference actual
+experience or skills — no generic claims.
+
+> **API platform ownership** — The role requires experience owning and shipping external APIs.
+> The candidate has led API design and governance including versioning strategy and developer
+> onboarding, which directly maps to this.
+
+### ⚠️ Gaps
+Name the JD requirement not clearly evidenced in the profile. Explain whether it's missing
+entirely, partially covered, or adjacent — and whether it's a dealbreaker or bridgeable in a
+cover letter or interview.
+
+> **Energy sector experience** — Listed as a bonus. The candidate's background is in API
+> infrastructure and fintech, not energy. Not a dealbreaker, but worth addressing directly.
+
+Don't manufacture matches. Don't downplay real gaps.
+
+---
+
+## Step 7 — Keyword mapping
+
+_(Skip this step if `profile.md` was not found in Step 3.)_
+
+Extract the most important keywords and phrases from the JD — terms likely to matter to a
+recruiter or ATS, or that signal the company's language for the role. Focus on:
+
+- Technical terms and tools named explicitly (e.g. "OpenAPI", "event-driven", "gRPC")
+- Methodology or process language (e.g. "discovery", "OKRs", "jobs-to-be-done")
+- Domain vocabulary specific to the company or sector (e.g. "energy transaction", "clearing")
+- Seniority and scope signals (e.g. "cross-functional influence", "roadmap ownership")
+
+For each keyword, classify it against the profile:
+
+**✅ Usable — confirmed by profile**
+The profile contains experience or skills that genuinely support this keyword. State exactly
+where it's grounded (e.g. "Work History: [Company] — API governance work").
+
+**〰️ Usable with caveat — partially supported**
+The profile contains adjacent or related experience but not a direct match. Suggest honest
+framing (e.g. "familiar with X through Y, not a primary owner").
+
+**❌ Not usable — not supported by profile**
+The profile provides no basis for this keyword. Flag it as a gap to develop or acknowledge
+in interview — don't suggest the candidate use it.
+
+Only include keywords where the classification adds value. Skip generic filler like
+"strong communicator" — focus on terms with real signal for this role.
+
+---
+
+## Step 8 — Present results
+
+Format new jobs as a numbered list, ordered strongest to weakest fit. For each:
+
+```
+## [N]. [Job Title] — [Company]
+📍 [Location]  🗓 Posted [date or "X days ago"]
+🏷 [fit signal 1] · [fit signal 2] · [fit signal 3]
+🔗 [URL]
+
+### ✅ Matches
+- **[JD requirement]** — [Why the profile satisfies it, specifically]
+
+### ⚠️ Gaps
+- **[JD requirement]** — [Nature of the gap and whether it's bridgeable]
+
+### 🔑 Keyword Mapping
+| Keyword | Status | Where in profile / Note |
+|---|---|---|
+| ... | ... | ... |
+```
+
+Weak-signal roles (e.g. flagged employer type) go at the bottom:
+> ⚠️ _[Flag reason] — included for completeness_
+
+End with:
+> _Found [N] new roles today. [M] previously seen listings were skipped._
+
+---
+
+## Step 9 — Save report to file
+
+After presenting results in chat, write the **same output** to a dated markdown file.
+
+**File path:** `~/job-search/reports/YYYY-MM-DD.md` using today's actual date.
+
+If a report for today already exists (e.g. from an earlier run the same day), append the new
+results to it under a new `---` divider with a run timestamp, rather than overwriting.
+
+**Report format:**
+
+```markdown
+# Job Search Report — [Day, DD Month YYYY]
+
+_Search config: [brief description e.g. "Senior/Lead/Staff/Principal PM · API/platform · UK remote"]_
+_Profile: [candidate name or "loaded" if profile.md exists, "not loaded" if missing]_
+
+---
+
+[Full results content — identical to chat output, including all role entries,
+match/gap analysis, keyword tables, flags, and the summary line]
+```
+
+Create `~/job-search/reports/` if it doesn't exist.
+
+After saving, confirm to the user:
+> _Report saved to `~/job-search/reports/YYYY-MM-DD.md`_
+
+---
+
+## Step 10 — Update seen_jobs.json
+
+Append all newly presented job URLs to `~/job-search/seen_jobs.json`. Never remove old entries.
+
+Create `~/job-search/` if it doesn't exist.
+
+---
+
+## Notes & Tips
+
+- **Reports**: Each search run saves a dated `.md` file to `~/job-search/reports/`. Multiple
+  runs on the same day append under a divider. Past reports can be reviewed to track which
+  roles have been applied to, followed up on, or closed.
+- **ATS domains**: Greenhouse (`greenhouse.io`), Lever (`lever.co`), Ashby (`ashbyhq.com`),
+  Workday, SmartRecruiters, Rippling
+- **False positives**: Skip aggregator pages and listicles unless they link to a real listing
+- **Date ambiguity**: Include but flag with ⚠️ if posting date can't be confirmed
+- **Salary**: Include in the summary if visible; flag if clearly outside profile expectations
+- **Hacker News "Who is Hiring"**: Monthly thread often surfaces niche technical PM roles
+  not on job boards — worth including in the search rotation
+- **Reset seen jobs**: If the user asks to clear history, empty `seen_jobs.json`
+- **Day-specific filters**: If the user adds one-off filters for a run, apply them as an
+  extra pass after Step 5, without saving them to the config
