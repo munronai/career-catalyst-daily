@@ -21,8 +21,9 @@ by the user and persist between sessions.
 The skill responds to three types of request. Detect intent from the user's message:
 
 ### "Run a search" / "Find me jobs" / "Check for new roles"
-→ Execute the full search pipeline: Steps 1–9 below. Results are presented in chat
+→ Execute the full search pipeline: Steps 1–10 below. Results are presented in chat
   **and** saved as a dated markdown report to `~/job-search/reports/`.
+  **Strict Compliance:** All steps must be followed exactly.
 
 ### "Show me my search criteria" / "What are my current search settings?"
 → Load `~/job-search/search-config.md` if it exists, otherwise load
@@ -85,26 +86,30 @@ for the expected structure.
 
 ## Step 4 — Search for jobs
 
-Run 8–12 web searches using the query templates from the active config. Vary the angle each
+Run 5–8 high-signal web searches using the query templates from the active config. Vary the angle each Vary the angle each
 time — different queries should surface different companies and sources. Always include temporal
 language ("last week", "past 6 days", "this week", current year) to bias toward fresh results.
 
-Prioritise variety over repetition.
+
+**Efficiency Rule:** Review titles and snippets from search results first. Discard obvious mismatches, aggregators, or expired roles before proceeding to fetching. Deduplicate URLs across all search results.
 
 ---
 
-## Step 5 — Fetch and validate each result
 
-For each promising URL:
+## Step 5 — Batch fetch and validate results
 
-1. **Fetch the page** — confirm it's a real listing, not a category page, 404, or aggregator
-2. **Check the posting date** — skip anything older than the freshness window in the config
-3. **Check the URL** against `seen_jobs.json` — skip if already present
-4. **Score the fit** against the strong/weak signals in the config
+For the filtered list of promising URLs: 
+
+1. **Batch Fetch** — Use a single tool call to fetch the content for all URLs at once. This minimises user permission prompts and context turns.                                                                                           
+2. **Validate** — For each fetched page:                                                                                            
+- Confirm it's a real listing (not a 404 or category page)                                                                                            
+- Check the posting date — skip anything older than the freshness window in the config                                                                         │
+- Check the URL against `seen_jobs.json` — skip if already present                                                                                          - Score the fit against the strong/weak signals in the config
 
 Hold in memory for each passing role:
 - Title, company, location, posting date
 - **Full job description text** — required for Steps 6 and 7
+- **Salary / Compensation** — extract explicitly; if not listed, note "Not listed"
 - Fit signals spotted
 - Direct application URL
 
@@ -121,17 +126,20 @@ more valuable than a flattering one.
 Name the JD requirement, then explain what in the profile satisfies it. Reference actual
 experience or skills — no generic claims.
 
-> **API platform ownership** — The role requires experience owning and shipping external APIs.
-> The candidate has led API design and governance including versioning strategy and developer
-> onboarding, which directly maps to this.
+
 
 ### ⚠️ Gaps
 Name the JD requirement not clearly evidenced in the profile. Explain whether it's missing
 entirely, partially covered, or adjacent — and whether it's a dealbreaker or bridgeable in a
 cover letter or interview.
 
-> **Energy sector experience** — Listed as a bonus. The candidate's background is in API
-> infrastructure and fintech, not energy. Not a dealbreaker, but worth addressing directly.
+### ✅ Matches & ⚠️ Gaps Table
+Create a table comparing the candidate's profile to the JD requirements.
+
+| Requirement | Status | Evidence / Nature of Gap |
+|---|---|---|
+| [JD requirement] | ✅ Match | [Why the profile satisfies it, specifically] |
+| [JD requirement] | ⚠️ Gap | [Nature of the gap and whether it's bridgeable] |
 
 Don't manufacture matches. Don't downplay real gaps.
 
@@ -175,14 +183,14 @@ Format new jobs as a numbered list, ordered strongest to weakest fit. For each:
 ```
 ## [N]. [Job Title] — [Company]
 📍 [Location]  🗓 Posted [date or "X days ago"]
+💰 Salary: [Amount or "Not listed"]
 🏷 [fit signal 1] · [fit signal 2] · [fit signal 3]
 🔗 [URL]
 
-### ✅ Matches
-- **[JD requirement]** — [Why the profile satisfies it, specifically]
-
-### ⚠️ Gaps
-- **[JD requirement]** — [Nature of the gap and whether it's bridgeable]
+### 📊 Match/Gap Analysis
+| Requirement | Status | Evidence / Nature of Gap |
+|---|---|---|
+| ... | ... | ... |
 
 ### 🔑 Keyword Mapping
 | Keyword | Status | Where in profile / Note |
