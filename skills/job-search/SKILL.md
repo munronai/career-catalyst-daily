@@ -73,7 +73,7 @@ Read `~/job-search/references/profile.md`.
 
 - **File exists** → load fully into context for Steps 6 and 7.
 - **File missing** → warn the user once at the top of your response:
-  > ⚠️ No profile found at `~/job-search/profile.md`. Match/gap analysis and keyword mapping
+  > ⚠️ No profile found at `~/job-search/references/profile.md`. Match/gap analysis and keyword mapping
   > will be skipped. See `references/profile-template.md` in this skill to get started.
 
   Then continue without analysis sections.
