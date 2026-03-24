@@ -50,6 +50,8 @@ In Claude Code, you can use the `/job-search` or `/role-prep` commands or simply
 
 ## What I Learned
 
+- When running in Claude in the browser, the web search was efficient and did not have a long running time. In Claude Code, the search became recursive and very expensive (I hit my limits on a single search).
+- I transferred the skill to Gemini CLI and asked for some changes to improve the efficiency of the search to make it less expensive. Gemini executed a less expensive search but did not strictly adhere to the instructions (e.g. salary/comp information was not checked). Further chnages were required to ensure the search and the report output were more consistent.
 - The job search performs the gap analysis on all roles found. This resulted in an unexpected bonus for me because it pulled out roles that I had dismissed (and therefore had not performed any gap analysis more thorough than my gut reaction). This opened up more opportunities.
 - The process of having Claude help me with my profile offered another angle on my experience and expertise.
 - I primarily used LinkedIn for job searches. The skill cannot do a thorough job here because it requires auth for this. A possible solution here is to find a tool (MCP) that can extend the search into LinkedIn.
