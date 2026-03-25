@@ -119,43 +119,26 @@ Hold in memory for each passing role:
 
 _(Skip this step if `profile.md` was not found in Step 3.)_
 
-Compare the full JD against `profile.md`. Be specific and honest — a useful gap analysis is
-more valuable than a flattering one.
-
-### ✅ Matches
-Name the JD requirement, then explain what in the profile satisfies it. Reference actual
-experience or skills — no generic claims.
-
-
-
-### ⚠️ Gaps
-Name the JD requirement not clearly evidenced in the profile. Explain whether it's missing
-entirely, partially covered, or adjacent — and whether it's a dealbreaker or bridgeable in a
-cover letter or interview.
+Compare the full JD against `profile.md`. Be specific and honest - a useful gap analysis is more valuable than a flaterring one. Provide a detailed breakdown of how the candidate's history satisfies the specific requirements of the JD.
 
 ### ✅ Matches & ⚠️ Gaps Table
-Create a table comparing the candidate's profile to the JD requirements.
+Create a table comparing the candidate's profile to the JD requirements. Focus on the JD's specific detail.
 
-| Requirement | Status | Evidence / Nature of Gap |
+| JD Requirement (Detail) | Status | Evidence / Bridge Strategy |
 |---|---|---|
-| [JD requirement] | ✅ Match | [Why the profile satisfies it, specifically] |
-| [JD requirement] | ⚠️ Gap | [Nature of the gap and whether it's bridgeable] |
+| [Specific quote or detail from JD] | ✅ Match | [Specific evidence from profile history/skills] |
+| [Specific quote or detail from JD] | 〰️ Judgment | [Professional judgment: how adjacent experience satisfies the intent] |
+| [Specific quote or detail from JD] | ⚠️ Gap | [Nature of the gap and whether it's bridgeable] |
 
-Don't manufacture matches. Don't downplay real gaps.
+**Judgment Rule:** Where a requirement doesn't explicitly match, make a professional judgment. If the user has adjacent experience, explain how this fulfill the *intent* of the JD (e.g., "Deep experience in ISO 20022 standards bridges the gap for the required Data Interoperability expertise").
 
 ---
 
-## Step 7 — Keyword mapping
+## Step 7 — Keyword mapping (ATS Optimization)
 
 _(Skip this step if `profile.md` was not found in Step 3.)_
 
-Extract the most important keywords and phrases from the JD — terms likely to matter to a
-recruiter or ATS, or that signal the company's language for the role. Focus on:
-
-- Technical terms and tools named explicitly (e.g. "OpenAPI", "event-driven", "gRPC")
-- Methodology or process language (e.g. "discovery", "OKRs", "jobs-to-be-done")
-- Domain vocabulary specific to the company or sector (e.g. "energy transaction", "clearing")
-- Seniority and scope signals (e.g. "cross-functional influence", "roadmap ownership")
+Extract high-signal keywords and phrases from the JD that are likely to be used by AI screening agents (ATS) or recruiters. For each keyword, identify where in the user's profile there is a potential match or where a truthful reframing could increase interview chances.
 
 For each keyword, classify it against the profile:
 
@@ -174,6 +157,15 @@ in interview — don't suggest the candidate use it.
 Only include keywords where the classification adds value. Skip generic filler like
 "strong communicator" — focus on terms with real signal for this role.
 
+### 🔑 Keyword Mapping Table
+| Keyword (ATS Signal) | Profile Potential | Actionable Reframing Suggestion |
+|---|---|---|
+| [e.g. "gRPC"] | ✅ Potential Match | [e.g. "Highlight gRPC usage in the KAO integration project"] |
+| [e.g. "API Standards"] | ✅ Usable | [e.g. "Explicitly use 'API Standards' instead of 'Design Guides' in SWIFT section"] |
+| [e.g. "PLG"] | ❌ Gap | [e.g. "Growth area; do not include in profile"] |
+
+**Reframing Rule:** Suggestions must remain **truthful and authentic**. Focus on highlighting existing experience using the JD's specific terminology to pass automated filters. Skip generic filler—focus on terms with real signal.
+
 ---
 
 ## Step 8 — Present results
@@ -188,12 +180,12 @@ Format new jobs as a numbered list, ordered strongest to weakest fit. For each:
 🔗 [URL]
 
 ### 📊 Match/Gap Analysis
-| Requirement | Status | Evidence / Nature of Gap |
+| JD Requirement (Detail) | Status | Evidence / Bridge Strategy |
 |---|---|---|
 | ... | ... | ... |
 
 ### 🔑 Keyword Mapping
-| Keyword | Status | Where in profile / Note |
+| Keyword (ATS Signal) | Profile Potential | Actionable Reframing Suggestion |
 |---|---|---|
 | ... | ... | ... |
 ```
